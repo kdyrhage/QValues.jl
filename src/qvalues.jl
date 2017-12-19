@@ -1,21 +1,25 @@
 """
-    qvalues(P, λ = 0:01:0.01:0.99)
+    qvalues(P, λ = 0.0:0.01:0.95)
 
 Calculate q-values from a set of p-values P. λ can be a range of values to test,
 or a fixed value.
 """
-function qvalues(P, λ = 0:01:0.01:0.99)
+function qvalues(P, λ = 0.05:0.01:0.95, π̂₀ = 0.0)
     order = sortperm(P)
     P = P[order]
     m = length(P)
-    pm = P[m]
-    # π̂ = sum(P .> λ) / (m * (1 - λ))
-    π̂₀ = estimate_π̂₀(P, λ)
-    q̂_pm = π̂ * pm
-    Q̂ = [q̂_pm]
+    if π̂₀ == 0.0
+        if length(λ) == 1
+            π̂₀ = π̂(P, λ)
+        else
+            π̂₀ = estimate_π̂₀(P, λ)
+        end
+    end
+    q̂ₚₘ = π̂₀ * P[m]
+    Q̂ = [q̂ₚₘ]
     for i in (m-1):-1:1
         q̂ = min(
-            π̂ * m * P[i] / i,
+            π̂₀ * m * P[i] / i,
             Q̂[end]
         )
         push!(Q̂, q̂)
@@ -29,22 +33,19 @@ end
 
 Calculate π̂₀ for a vector of p-values P at a given λ.
 """
-π̂₀(P, λ) = mean(P .>= λ) / (1 - λ)
+π̂(P, λ) = mean(P .> λ) / (1 - λ)
 
 
 """
-    estimate_π̂₀(P, λs = 0.01:0.01:0.99)
+    estimate_π̂₀(P, λs = 0.05:0.01:0.95)
 
 Estimate the proportion of true null hypotheses, π̂₀, given a range of λs.
 """
-function estimate_π̂₀(P, λs = 0.01:0.01:0.99)
+function estimate_π̂₀(P, λs = 0.05:0.01:0.95)
     π̂s = Float64[]
     for λ in λs
-        # push!(π̂s, min(1, π̂₀(P, λ)))
-        push!(π̂s, π̂₀(P, λ))
+        push!(π̂s, π̂(P, λ))
     end
-    # return π̂s
-    itp = interpolate(π̂s, BSpline(Cubic(Natural())), OnGrid())
-    sitp = scale(itp, λs)
-    return sitp
+    spl = fit(SmoothingSpline, collect(λs), π̂s, 0.015) # 0.015 might not be a good λ for every dataset
+    return predict(spl, 1.0)
 end

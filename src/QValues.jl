@@ -1,6 +1,6 @@
 module QValues
 
-using Interpolations
+using SmoothingSplines
 
 export qvalues
 
