@@ -1,5 +1,5 @@
 """
-    qvalues(P, λ = 0.0:0.01:0.95)
+    qvalues(P, λ = 0.05:0.01:0.95)
 
 Calculate q-values from a set of p-values P. λ can be a range of values to test,
 or a fixed value.
