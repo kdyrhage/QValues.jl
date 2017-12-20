@@ -82,6 +82,7 @@ Keyword arguments `B` controls the number of bootstraps to run for each λ, whil
 """
 function bootstrap_π̂₀(P, γ = 0.05, λs = 0.00:0.05:0.95; B = 100, f = 0.5)
     nsamples = floor(Int, f * length(P))
+    Pb = zeros(Float64, nsamples)
     pF̂DRλ = Float64[]
     for λ in λs
         push!(pF̂DRλ, pFDRλ(P, λ, γ))
@@ -90,7 +91,8 @@ function bootstrap_π̂₀(P, γ = 0.05, λs = 0.00:0.05:0.95; B = 100, f = 0.5)
     for λ in λs
         pF̂DRλb = Float64[]
         for b in 1:B
-            Pb = StatsBase.sample(P, floor(Int, f * length(P)), replace = false)
+            # Pb = P[StatsBase.sample(1:length(P), nsamples, replace = false)]
+            StatsBase.seqsample_a!(P, Pb)
             push!(pF̂DRλb, pFDRλ(Pb, λ, γ))
         end
         push!(M̂SEλ, (1/B) * sum((pF̂DRλb .- minimum(pF̂DRλ)).^2))
