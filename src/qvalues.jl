@@ -5,7 +5,7 @@ Calculate q-values from a set of p-values P. λ can be a range of values to test
 or a fixed value.
 """
 function qvalues(P, λ = 0.05:0.01:0.99, π̂₀ = 0.0;
-                 method = :bootstrap, B = 500, fraction = 0.6, γ = 0.05)
+                 method = :bootstrap, B = 100, fraction = 0.6, γ = 0.05)
     order = sortperm(P)
     P = P[order]
     m = length(P)
@@ -111,7 +111,7 @@ Estimate π̂₀ using a fast method.
 This is the "bootstrap" method implemented in Storey's qvalue package in R. It
 doesn't actually perform bootstrapping, but it is very fast.
 """
-function fast_π̂₀(P, λs)
+function fast_π̂₀(P, λs = 0.01:0.01:0.95)
     m = length(P)
     π̂s = [π̂(P, λ) for λ in λs]
     minπ̂ = quantile(π̂s, 0.1)
