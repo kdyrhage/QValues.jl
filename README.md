@@ -23,4 +23,4 @@ using Plots
 scatter(P, Q, xlabel = "p-value", ylabel = "q-value", marker = (2, :black))
 ```
 
-Three methods are available for estimating the null hypothesis rate: ```:spline```, ```:bootstrap```, and ```:fast```.
+Three methods are available for estimating the null hypothesis rate: ```:spline```, ```:bootstrap```, and ```:fast```. ```:spline``` and ```:bootstrap``` use the methods described in [1] and [2], respectively, while ```:fast``` uses the "bootstrap" method used in the [qvalue package for R](https://github.com/StoreyLab/qvalue/) (which does not actually involve any bootstrapping). ```:bootstrap``` is much slower than the other two methods. The number of bootstraps can be adjusted with the ```B``` keyword, and the size of the fraction used for each iteration can be adjusted with ```fraction```.
