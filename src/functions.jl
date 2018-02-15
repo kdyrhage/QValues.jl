@@ -28,7 +28,7 @@ function qvalues(P, λ = 0.05:0.01:0.95, π̂₀ = 0.0;
         end
     end
     q̂ₚₘ = π̂₀ * P[m]
-    Q̂ = [q̂ₚₘ]
+    Q̂ = Float64[q̂ₚₘ]
     for i in (m-1):-1:1
         q̂ = min(
             π̂₀ * m * P[i] / i,
@@ -45,7 +45,7 @@ end
 
 Calculate π̂₀ for a vector of p-values ```P``` at a given λ.
 """
-π̂(P, λ) = mean(P .> λ) / (1 - λ)
+π̂(P, λ) = mean(P .> λ) / (1.0 - λ)
 
 
 """
@@ -71,7 +71,7 @@ Estimate pFDR(γ) for a given λ.
 function pFDRλ(P, λ, γ)
     m = length(P)
     π̂₀ = π̂(P, λ)
-    P̂rPγ = max(sum(P .<= γ), 1.) / m
+    P̂rPγ = max(sum(P .<= γ), 1) / m
     pF̂DRλ = (π̂₀ * γ) / (P̂rPγ * (1 - (1 - γ)^m))
     return min(1., pF̂DRλ)
 end
@@ -114,11 +114,12 @@ Estimate π̂₀ using a fast method.
 This is the "bootstrap" method implemented in Storey's qvalue package in R. It
 doesn't actually perform bootstrapping, but it is very fast.
 """
-function fast_π̂₀(P, λs = 0.05:0.01:0.95)
+function fast_π̂₀(P::Vector{T}, λs = 0.05:0.01:0.95) where {T <: AbstractFloat}
     m = length(P)
     π̂s = [π̂(P, λ) for λ in λs]
     minπ̂ = quantile(π̂s, 0.1)
     W = [sum(P .>= λ) for λ in λs]
     mse = (W ./ (m^2 .* (1 .- λs).^2)) .* (1 .- W ./ m) .+ (π̂s .- minπ̂).^2
     π̂₀ = min(π̂s[indmin(mse)]..., 1)
+    return π̂₀::T
 end
