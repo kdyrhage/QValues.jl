@@ -27,8 +27,6 @@ function qvalues(P::Vector{T}, λ = 0.05:0.01:0.95, π̂₀ = 0.0;
             end
         end
     end
-    # q̂ₚₘ = π̂₀ * P[m]
-    # Q̂ = Float64[q̂ₚₘ]
     Q̂ = Vector{T}(length(P))
     Q̂[end] = π̂₀ * last(P)
     for i in (m-1):-1:1
@@ -37,10 +35,8 @@ function qvalues(P::Vector{T}, λ = 0.05:0.01:0.95, π̂₀ = 0.0;
             Q̂[end]
         )
         Q̂[i] = q̂
-        # push!(Q̂, q̂)
     end
     return Q̂[sortperm(order)]
-    # return Q̂[sortperm(reverse(order))]
 end
 
 
@@ -89,7 +85,7 @@ Use bootstrap method to estimate π̂₀.
 Keyword arguments ```B``` controls the number of bootstraps to run for each λ, while
 ```fraction``` is the fraction of the original dataset to use for each bootstrap.
 """
-function bootstrap_π̂₀(P, γ = 0.05, λs = 0.01:0.01:0.95; B = 100, fraction = 0.6)
+function bootstrap_π̂₀(P::Vector{T}, γ = 0.05, λs = 0.01:0.01:0.95; B = 100, fraction = 0.6) where T
     nsamples = floor(Int, fraction * length(P))
     Pb = zeros(Float64, nsamples)
     pF̂DRλ = Float64[]
@@ -98,10 +94,10 @@ function bootstrap_π̂₀(P, γ = 0.05, λs = 0.01:0.01:0.95; B = 100, fraction
     end
     M̂SEλ = Float64[]
     for λ in λs
-        pF̂DRλb = Float64[]
+        pF̂DRλb = Vector{T}(B)
         for b in 1:B
             StatsBase.seqsample_a!(P, Pb)
-            push!(pF̂DRλb, pFDRλ(Pb, λ, γ))
+            pF̂DRλb[b] = pFDRλ(Pb, λ, γ)
         end
         push!(M̂SEλ, (1/B) * sum((pF̂DRλb .- minimum(pF̂DRλ)).^2))
     end
