@@ -1,8 +1,7 @@
 # QValues.jl
 ## Installation
-QValues and its one dependency can be installed from within Julia using
+QValues can be installed from within Julia using
 ```julia
-Pkg.add("SmoothingSplines")
 Pkg.clone("git@github.com:kdyrhage/QValues.jl.git")
 ```
 
