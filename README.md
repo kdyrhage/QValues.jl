@@ -51,6 +51,10 @@ P0 = rand(1000)
 P1 = vcat([rand(div(1000, 2i)) / i^2 for i in 4:9]...)
 P = [P0; P1]
 
-Q = qvalues(P)
+Q = qvalues(P, method = :bootstrap)
 sum(Q .<= 0.05)
 ```
+
+## References
+1. John D. Storey and Robert Tibshirani, Statistical significance for genomewide studies, *Proceedings of the National Academy of Sciences* **100**, 9440-9445 (2003)
+2. John D. Storey, A direct approach to false discovery rates, *Journal of the Royal Statistical Society: Series B* **64**, 479-498 (2002)
