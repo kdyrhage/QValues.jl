@@ -5,6 +5,6 @@ using StatsBase
 
 export qvalues
 
-include("qvalues.jl")
+include("functions.jl")
 
 end
