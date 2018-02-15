@@ -1,11 +1,14 @@
 """
-    qvalues(P, λ = 0.05:0.01:0.95)
+    qvalues(P, λ = 0.05:0.01:0.95, π̂₀ = 0.0;
+            method = :spline, B = 100, fraction = 0.6, γ = 0.05)
 
-Calculate q-values from a set of p-values P. λ can be a range of values to test,
-or a fixed value.
+Calculate q-values from a set of p-values ```P```. ```λ``` can be a range of values to test,
+or a fixed value. The rate of the null hypothesis π̂₀ can be set, or left at 0.0
+in which case it will be estimated. Valid choices of estimators (passed with
+```method```) are ```:spline```, ```:fast```, and ```:bootstrap```.
 """
-function qvalues(P, λ = 0.05:0.01:0.99, π̂₀ = 0.0;
-                 method = :bootstrap, B = 100, fraction = 0.6, γ = 0.05)
+function qvalues(P, λ = 0.05:0.01:0.95, π̂₀ = 0.0;
+                 method = :spline, B = 100, fraction = 0.6, γ = 0.05)
     order = sortperm(P)
     P = P[order]
     m = length(P)
@@ -40,7 +43,7 @@ end
 """
     π̂₀(P, λ)
 
-Calculate π̂₀ for a vector of p-values P at a given λ.
+Calculate π̂₀ for a vector of p-values ```P``` at a given λ.
 """
 π̂(P, λ) = mean(P .> λ) / (1 - λ)
 
@@ -75,15 +78,15 @@ end
 
 
 """
-    bootstrap_π̂₀(P, γ = 0.05, λs = 0.05:0.01:0.95; B = 100, f = 0.6)
+    bootstrap_π̂₀(P, γ = 0.05, λs = 0.05:0.01:0.95; B = 100, fraction = 0.6)
 
-Use bootstrap method to estimating the best λ.
+Use bootstrap method to estimate π̂₀.
 
-Keyword arguments `B` controls the number of bootstraps to run for each λ, while
-`f` is the fraction of the original dataset to use for each bootstrap.
+Keyword arguments ```B``` controls the number of bootstraps to run for each λ, while
+```fraction``` is the fraction of the original dataset to use for each bootstrap.
 """
-function bootstrap_π̂₀(P, γ = 0.05, λs = 0.01:0.01:0.95; B = 100, f = 0.6)
-    nsamples = floor(Int, f * length(P))
+function bootstrap_π̂₀(P, γ = 0.05, λs = 0.01:0.01:0.95; B = 100, fraction = 0.6)
+    nsamples = floor(Int, fraction * length(P))
     Pb = zeros(Float64, nsamples)
     pF̂DRλ = Float64[]
     for λ in λs
@@ -111,7 +114,7 @@ Estimate π̂₀ using a fast method.
 This is the "bootstrap" method implemented in Storey's qvalue package in R. It
 doesn't actually perform bootstrapping, but it is very fast.
 """
-function fast_π̂₀(P, λs = 0.01:0.01:0.95)
+function fast_π̂₀(P, λs = 0.05:0.01:0.95)
     m = length(P)
     π̂s = [π̂(P, λ) for λ in λs]
     minπ̂ = quantile(π̂s, 0.1)
