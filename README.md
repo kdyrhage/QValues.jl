@@ -1,19 +1,31 @@
 # QValues.jl
 ## Installation
-QValues.jl can be install from within Julia using
+QValues and its one dependency can be installed from within Julia using
 ```julia
+Pkg.add("SmoothingSplines")
 Pkg.clone("git@github.com:kdyrhage/QValues.jl.git")
 ```
 
 ## Usage
+QValues only exports one function:
+```julia
+# Calculate q-values given a set of p-values P:
+qvalues(P)
+
+# A range or vector containing lambda values to be tested can also be included:
+qvalues(P, 0.01:0.01:0.99)
+
+# The method for estimating the rate of true nulls can be changed, and for
+# :bootstrap additional variables can be set:
+qvalues(P, method = :bootstrap, B = 1000, fraction = 0.8```.
+
 Examples usage:
 ```julia
 using QValues
 using RDatasets
 
-# Load a dataset that contains p-values. This set actually
-# contains values 0 < p < 0.05, so multiply by 20 to get
-# 0 < p < 1
+# Load a dataset that contains p-values. This set actually contains
+# values in 0 < p < 0.05, so multiply by 20 to get 0 < p < 1
 manhattan = dataset("gap", "mhtdata")
 P = 20 * manhattan[:P]
 
