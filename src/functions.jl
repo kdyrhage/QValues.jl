@@ -32,7 +32,7 @@ function qvalues(P::Vector{T}, λ = 0.05:0.01:0.95, π̂₀ = 0.0;
     for i in (m-1):-1:1
         q̂ = min(
             π̂₀ * m * P[i] / i,
-            Q̂[end]
+            Q̂[i+1]
         )
         Q̂[i] = q̂
     end
