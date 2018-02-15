@@ -17,7 +17,11 @@ qvalues(P, 0.01:0.01:0.99)
 
 # The method for estimating the rate of true nulls can be changed, and for
 # :bootstrap additional variables can be set:
-qvalues(P, method = :bootstrap, B = 1000, fraction = 0.8```.
+qvalues(P, method = :bootstrap, B = 1000, fraction = 0.8)
+
+# Other estimation methods ignore these options
+qvalues(P, method = :fast, B = 1)
+```
 
 Examples usage:
 ```julia

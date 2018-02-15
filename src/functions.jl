@@ -41,7 +41,7 @@ end
 
 
 """
-    π̂₀(P, λ)
+    π̂(P, λ)
 
 Calculate π̂₀ for a vector of p-values ```P``` at a given λ.
 """
