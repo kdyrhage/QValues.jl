@@ -7,8 +7,8 @@ or a fixed value. The rate of the null hypothesis π̂₀ can be set, or left at
 in which case it will be estimated. Valid choices of estimators (passed with
 ```method```) are ```:spline```, ```:fast```, and ```:bootstrap```.
 """
-function qvalues(P, λ = 0.05:0.01:0.95, π̂₀ = 0.0;
-                 method = :spline, B = 100, fraction = 0.6, γ = 0.05)
+function qvalues(P::Vector{T}, λ = 0.05:0.01:0.95, π̂₀ = 0.0;
+                 method = :spline, B = 100, fraction = 0.6, γ = 0.05) where T
     order = sortperm(P)
     P = P[order]
     m = length(P)
@@ -17,7 +17,7 @@ function qvalues(P, λ = 0.05:0.01:0.95, π̂₀ = 0.0;
             π̂₀ = π̂(P, λ)
         else
             if method == :bootstrap
-                π̂₀ = bootstrap_π̂₀(P, γ, λ; B = B, f = fraction)
+                π̂₀ = bootstrap_π̂₀(P, γ, λ; B = B, fraction = fraction)
             elseif method == :fast
                 π̂₀ = fast_π̂₀(P, λ)
             elseif method == :spline
@@ -27,16 +27,20 @@ function qvalues(P, λ = 0.05:0.01:0.95, π̂₀ = 0.0;
             end
         end
     end
-    q̂ₚₘ = π̂₀ * P[m]
-    Q̂ = Float64[q̂ₚₘ]
+    # q̂ₚₘ = π̂₀ * P[m]
+    # Q̂ = Float64[q̂ₚₘ]
+    Q̂ = Vector{T}(length(P))
+    Q̂[end] = π̂₀ * last(P)
     for i in (m-1):-1:1
         q̂ = min(
             π̂₀ * m * P[i] / i,
             Q̂[end]
         )
-        push!(Q̂, q̂)
+        Q̂[i] = q̂
+        # push!(Q̂, q̂)
     end
-    return Q̂[sortperm(reverse(order))]
+    return Q̂[sortperm(order)]
+    # return Q̂[sortperm(reverse(order))]
 end
 
 
